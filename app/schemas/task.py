@@ -26,3 +26,5 @@ class TaskInDB(TaskBase):
 
 class TaskOut(TaskInDB):
     pass
+
+TaskRead = TaskOut

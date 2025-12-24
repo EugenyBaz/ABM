@@ -1,13 +1,15 @@
-import asyncio
 from app.bot.bot import dp, bot
-from loguru import logger
-from app.core.logging import setup_logging
+import asyncio
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 async def main():
-    setup_logging()
-    logger.info("🚀 Telegram bot started")
-
-    await dp.start_polling(bot)
+    print("🚀 Telegram bot started")
+    try:
+        await dp.start_polling(bot)
+    finally:
+        await bot.session.close()
 
 if __name__ == "__main__":
     asyncio.run(main())

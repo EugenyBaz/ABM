@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int | None = None
     SMTP_USER: str | None = None
     SMTP_PASSWORD: str | None = None
+    API_URL: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",
