@@ -1,37 +1,74 @@
 import pytest
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
+import asyncio
+import pytest_asyncio
+from httpx import AsyncClient, ASGITransport
+from sqlalchemy.ext.asyncio import (
+    create_async_engine,
+    async_sessionmaker,
+    AsyncSession,
+)
+from sqlalchemy import text
+
 from app.main import app
-from app.models.tasks import Task
+from app.core.config import settings
+from app.api.deps import get_db
 
-# Фикстура для чистой сессии
-@pytest.fixture
-async def async_session_fixture(async_session: AsyncSession):
-    # очищаем таблицу tasks перед тестом
-    await async_session.execute("DELETE FROM tasks;")
-    await async_session.commit()
-    yield async_session
-    await async_session.execute("DELETE FROM tasks;")
-    await async_session.commit()
+DATABASE_URL = settings.DATABASE_URL
 
-# Фикстура для заполнения тестовыми задачами
-@pytest.fixture
-async def sample_tasks(async_session_fixture: AsyncSession):
-    tasks = [
-        Task(user_id=111111, title="Task A", description="Desc A"),
-        Task(user_id=222222, title="Task B", description="Desc B"),
-        Task(user_id=333333, title="Task C", description="Desc C"),
-    ]
-    async_session_fixture.add_all(tasks)
-    await async_session_fixture.commit()
-    # обновляем объекты, чтобы был доступ к id
-    await async_session_fixture.refresh(tasks[0])
-    await async_session_fixture.refresh(tasks[1])
-    await async_session_fixture.refresh(tasks[2])
-    return tasks
 
-# Фикстура для клиента FastAPI
+@pytest_asyncio.fixture
+async def engine():
+    engine = create_async_engine(settings.DATABASE_URL, echo=False)
+    yield engine
+    await engine.dispose()
+
+# ---------- DB session ----------
+
+@pytest_asyncio.fixture
+async def db_session(engine):
+    async_session = async_sessionmaker(
+        engine,
+        expire_on_commit=False,
+        class_=AsyncSession,
+    )
+    async with async_session() as session:
+        yield session
+
+
+# ---------- Override get_db ----------
+@pytest_asyncio.fixture
+async def override_get_db(db_session):
+    async def _override():
+        yield db_session
+
+    app.dependency_overrides[get_db] = _override
+    yield
+    app.dependency_overrides.clear()
+
+# ---------- Clean DB ----------
+@pytest_asyncio.fixture(autouse=True)
+async def clean_db(override_get_db, db_session):
+    await db_session.execute(
+        text("TRUNCATE TABLE tasks RESTART IDENTITY CASCADE")
+    )
+    await db_session.commit()
+
+# ---------- HTTP client ----------
+@pytest_asyncio.fixture
+async def client(override_get_db):
+    transport = ASGITransport(app=app)
+    async with AsyncClient(
+        transport=transport,
+        base_url="http://test",
+    ) as client:
+        yield client
+
+# ---------- Headers ----------
 @pytest.fixture
-async def client(sample_tasks):
-    async with AsyncClient(app=app, base_url="http://test") as ac:
-        yield ac
+def user_1_headers():
+    return {"x-telegram-user-id": "111"}
+
+@pytest.fixture
+def user_2_headers():
+    return {"x-telegram-user-id": "222"}
+

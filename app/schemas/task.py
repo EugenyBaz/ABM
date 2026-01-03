@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -21,8 +21,7 @@ class TaskInDB(TaskBase):
     created_at: datetime
     updated_at: Optional[datetime]
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 class TaskOut(TaskInDB):
     pass
