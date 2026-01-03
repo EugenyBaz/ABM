@@ -44,16 +44,6 @@ async def process_description(message: types.Message, state: FSMContext):
     await state.clear()
 
 
-# # Список задач
-# @router.message(F.text.startswith("/tasks"))
-# async def list_tasks(message: types.Message):
-#     user_id = message.from_user.id
-#     tasks = await get_tasks_api(user_id)  # функция обращается к FastAPI
-#     if not tasks:
-#         await message.answer("У вас пока нет задач.")
-#     else:
-#         text = "\n".join([f"{t['id']}: {t['title']} ({t['status']})" for t in tasks])
-#         await message.answer(text)
 
 
 
