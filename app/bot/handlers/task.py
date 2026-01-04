@@ -1,8 +1,9 @@
+import httpx
 from aiogram import Router, types, F
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-from app.bot.services import create_task_api, get_tasks_api
+from app.bot.services import create_task_api, get_tasks_api, send_tasks_email_api
 
 router = Router()
 
@@ -44,6 +45,34 @@ async def process_description(message: types.Message, state: FSMContext):
     await state.clear()
 
 
+@router.message(F.text == "/tasks")
+async def cmd_tasks(message: types.Message):
+    user_id = message.from_user.id
+    tasks = await get_tasks_api(user_id, view="short")
 
+    if not tasks:
+        await message.answer("📭 У вас пока нет задач")
+        return
 
+    text = "\n".join(
+        f"{t['id']}. {t['title']} ({t['status']})"
+        for t in tasks
+    )
+
+    await message.answer("📋 Ваши задачи:\n" + text)
+
+@router.message(F.text == "/email")
+async def cmd_email_tasks(message: types.Message):
+    user_id = message.from_user.id
+
+    try:
+        result = await send_tasks_email_api(user_id)
+    except httpx.HTTPStatusError:
+        await message.answer("❌ Ошибка при отправке email")
+        return
+
+    await message.answer(
+        f"📧 Задачи отправлены на почту\n"
+        f"📝 Количество: {result['tasks_count']}"
+    )
 

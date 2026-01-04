@@ -2,7 +2,6 @@ from aiosmtplib import SMTP
 from email.message import EmailMessage
 from jinja2 import Environment, FileSystemLoader
 import os
-import asyncio
 from app.core.config import settings
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,3 +29,27 @@ async def send_tasks_email(to_email: str, tasks: list, subject: str = "Ваши 
     await smtp.send_message(message)
     await smtp.quit()
     print(f"Письмо отправлено на {to_email}")
+
+async def send_task_email(
+        to_email: str,
+        task,
+        subject: str = "Задача",
+):
+    template = env.get_template("task.html")
+    html_content = template.render(task=task)
+
+    message = EmailMessage()
+    message["From"] = settings.SMTP_USER
+    message["To"] = to_email
+    message["Subject"] = subject
+    message.set_content(html_content, subtype="html")
+
+    smtp = SMTP(
+        hostname=settings.SMTP_HOST,
+        port=settings.SMTP_PORT,
+        use_tls=True,
+    )
+    await smtp.connect()
+    await smtp.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+    await smtp.send_message(message)
+    await smtp.quit()

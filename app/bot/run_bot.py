@@ -10,6 +10,7 @@ async def setup_commands():
     commands = [
         BotCommand(command="add_task", description="➕ Добавить задачу"),
         BotCommand(command="list", description="📝 Список задач"),
+        BotCommand(command="email", description="📧 Отправить все задачи на почту"),
     ]
     await bot.set_my_commands(commands)
 

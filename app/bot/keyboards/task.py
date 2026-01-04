@@ -28,6 +28,13 @@ def task_keyboard(task_id: int) -> InlineKeyboardMarkup:
                     ).pack()
                 ),
                 InlineKeyboardButton(
+                    text="📧 Email",
+                    callback_data=TaskAction(
+                        action="email",
+                        task_id=task_id,
+                    ).pack()
+                ),
+                InlineKeyboardButton(
                     text="🗑 Delete",
                     callback_data=TaskAction(
                         action="delete",

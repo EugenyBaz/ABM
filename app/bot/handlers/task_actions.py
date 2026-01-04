@@ -9,7 +9,7 @@ from app.bot.callbacks import TaskAction
 from app.bot.services import (
     get_task_api,
     mark_task_done_api,
-    delete_task_api,
+    delete_task_api, send_task_email_api,
 )
 
 router = Router()
@@ -31,6 +31,7 @@ async def handle_task_action(
             task = await get_task_api(task_id, user_id)
             text = (
                 f"📌 <b>{task['title']}</b>\n\n"
+                f"🆔 <b>{task['id']}</b>\n\n"
                 f"{task['description']}\n\n"
                 f"Статус: <b>{task['status']}</b>"
             )
@@ -57,6 +58,14 @@ async def handle_task_action(
                 parse_mode="HTML",
             )
 
+        # EMAIL
+        elif action == "email":
+            await send_task_email_api(task_id, user_id)
+            await callback.answer(
+                "📧 Задача отправлена на почту",
+                show_alert=True)
+            return
+
         # 🗑 DELETE
         elif action == "delete":
             await delete_task_api(task_id, user_id)
@@ -65,6 +74,8 @@ async def handle_task_action(
         else:
             await callback.answer("Неизвестное действие", show_alert=True)
             return
+
+
 
     except httpx.HTTPStatusError:
         await callback.answer("❌ Ошибка сервера", show_alert=True)
@@ -76,3 +87,4 @@ async def handle_task_action(
 
     # Закрываем callback (убирает «часики»)
     await callback.answer()
+
