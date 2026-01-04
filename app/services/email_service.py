@@ -3,6 +3,10 @@ from email.message import EmailMessage
 from jinja2 import Environment, FileSystemLoader
 import os
 from app.core.config import settings
+from app.schemas.marketing import MarketingMessage
+from datetime import datetime
+
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates", "emails")
@@ -52,4 +56,30 @@ async def send_task_email(
     await smtp.connect()
     await smtp.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
     await smtp.send_message(message)
+    await smtp.quit()
+
+
+
+async def send_marketing_email(message: MarketingMessage) -> None:
+    template = env.get_template("marketing.html")
+
+    html_content = template.render(
+        content=message.body_html,
+        received_at=message.received_at,
+    )
+
+    email = EmailMessage()
+    email["From"] = settings.SMTP_USER
+    email["To"] = settings.SMTP_USER  # отправляем на ТУ ЖЕ почту
+    email["Subject"] = message.subject
+    email.set_content(html_content, subtype="html")
+
+    smtp = SMTP(
+        hostname=settings.SMTP_HOST,
+        port=settings.SMTP_PORT,
+        use_tls=True,
+    )
+    await smtp.connect()
+    await smtp.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+    await smtp.send_message(email)
     await smtp.quit()

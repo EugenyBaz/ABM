@@ -105,3 +105,5 @@ async def send_tasks_email_api(user_id: int):
     )
     response.raise_for_status()
     return response.json()
+
+
