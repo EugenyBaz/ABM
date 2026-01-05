@@ -74,6 +74,17 @@ async def send_marketing_email(message: MarketingMessage) -> None:
     email["Subject"] = message.subject
     email.set_content(html_content, subtype="html")
 
+    # 📎 Вложения
+    for attachment in message.attachments:
+        maintype, subtype = attachment.mime_type.split("/", 1)
+
+        email.add_attachment(
+            attachment.content,
+            maintype=maintype,
+            subtype=subtype,
+            filename=attachment.filename,
+        )
+
     smtp = SMTP(
         hostname=settings.SMTP_HOST,
         port=settings.SMTP_PORT,
