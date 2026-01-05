@@ -67,12 +67,17 @@ async def cmd_email_tasks(message: types.Message):
 
     try:
         result = await send_tasks_email_api(user_id)
+
+
+        await message.answer(
+            "📧 <b>Список задач отправлен</b>\n\n"
+            f"📬 Почта: <code>{result['sent_to']}</code>\n"
+            f"📝 Количество задач: <b>{result['tasks_count']}</b>",
+            parse_mode="HTML",
+        )
+
     except httpx.HTTPStatusError:
         await message.answer("❌ Ошибка при отправке email")
         return
 
-    await message.answer(
-        f"📧 Задачи отправлены на почту\n"
-        f"📝 Количество: {result['tasks_count']}"
-    )
 

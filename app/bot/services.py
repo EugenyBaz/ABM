@@ -1,18 +1,10 @@
 import httpx
 from app.core.config import settings
 
-# Базовый URL для работы с задачами
 API_BASE_URL = f"{settings.API_URL}/tasks"
-
-# Один HTTP-клиент на всё приложение
-client = httpx.AsyncClient(
-    base_url=API_BASE_URL,
-    timeout=httpx.Timeout(5.0),
-)
 
 
 def _auth_headers(user_id: int) -> dict:
-    """Заголовки авторизации для API."""
     return {
         "X-Telegram-User-Id": str(user_id),
     }
@@ -20,25 +12,26 @@ def _auth_headers(user_id: int) -> dict:
 
 # ---------- CREATE ----------
 async def create_task_api(title: str, description: str, user_id: int) -> dict:
-    response = await client.post(
-        "",
-        json={
-            "title": title,
-            "description": description,
-            "status": "pending",
-        },
-        headers=_auth_headers(user_id),
-    )
-    response.raise_for_status()
-    return response.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.post(
+            f"{API_BASE_URL}/",
+            json={
+                "title": title,
+                "description": description,
+                "status": "pending",
+            },
+            headers=_auth_headers(user_id),
+        )
+        response.raise_for_status()
+        return response.json()
 
 
 # ---------- READ LIST ----------
-async def get_tasks_api(user_id: int, view: str = "short"):
-    async with httpx.AsyncClient() as client:
+async def get_tasks_api(user_id: int, view: str = "short") -> list:
+    async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.get(
-            f"{settings.API_URL}/tasks/",
-            headers={"x-telegram-user-id": str(user_id)},
+            f"{API_BASE_URL}/",
+            headers=_auth_headers(user_id),
             params={"view": view},
         )
         response.raise_for_status()
@@ -47,63 +40,64 @@ async def get_tasks_api(user_id: int, view: str = "short"):
 
 # ---------- READ ONE ----------
 async def get_task_api(task_id: int, user_id: int) -> dict:
-    response = await client.get(
-        f"/{task_id}",
-        headers=_auth_headers(user_id),
-    )
-    response.raise_for_status()
-    return response.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.get(
+            f"{API_BASE_URL}/{task_id}",
+            headers=_auth_headers(user_id),
+        )
+        response.raise_for_status()
+        return response.json()
 
 
 # ---------- UPDATE ----------
 async def mark_task_done_api(task_id: int, user_id: int) -> dict:
-    response = await client.put(
-        f"/{task_id}",
-        json={"status": "done"},
-        headers=_auth_headers(user_id),
-    )
-    response.raise_for_status()
-    return response.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.put(
+            f"{API_BASE_URL}/{task_id}",
+            json={"status": "done"},
+            headers=_auth_headers(user_id),
+        )
+        response.raise_for_status()
+        return response.json()
+
 
 async def update_task_api(task_id: int, user_id: int, data: dict) -> dict:
-    response = await client.put(
-        f"/{task_id}",
-        json=data,
-        headers=_auth_headers(user_id),
-    )
-    response.raise_for_status()
-    return response.json()
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.put(
+            f"{API_BASE_URL}/{task_id}",
+            json=data,
+            headers=_auth_headers(user_id),
+        )
+        response.raise_for_status()
+        return response.json()
 
 
 # ---------- DELETE ----------
-async def delete_task_api(task_id: int, user_id: int) -> bool:
-    response = await client.delete(
-        f"/{task_id}",
-        headers=_auth_headers(user_id),
-    )
-    response.raise_for_status()
-    return True
-
-
-# ---------- SHUTDOWN ----------
-async def close_api_client():
-    """Корректно закрыть HTTP-клиент при завершении бота."""
-    await client.aclose()
-
-async def send_task_email_api(task_id: int, user_id: int):
-    async with httpx.AsyncClient() as client:
-        response = await client.post(
-            f"{settings.API_URL}/tasks/{task_id}/email",
-            headers={"x-telegram-user-id": str(user_id)},
+async def delete_task_api(task_id: int, user_id: int) -> None:
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        response = await client.delete(
+            f"{API_BASE_URL}/{task_id}",
+            headers=_auth_headers(user_id),
         )
         response.raise_for_status()
 
-async def send_tasks_email_api(user_id: int):
-    response = await client.post(
-        "/email",
-        headers=_auth_headers(user_id),
-    )
-    response.raise_for_status()
-    return response.json()
 
+# ---------- EMAIL ----------
+async def send_tasks_email_api(user_id: int) -> None:
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        response = await client.post(
+            f"{API_BASE_URL}/email",
+            headers=_auth_headers(user_id),
+        )
+        response.raise_for_status()
+        return response.json()
+
+
+async def send_task_email_api(task_id: int, user_id: int) -> None:
+    async with httpx.AsyncClient(timeout=20.0) as client:
+        response = await client.post(
+            f"{API_BASE_URL}/{task_id}/email",
+            headers=_auth_headers(user_id),
+        )
+        response.raise_for_status()
 

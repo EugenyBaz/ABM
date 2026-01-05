@@ -31,6 +31,7 @@ async def read_task(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id),
 ):
+    print("READ TASKS user_id =", user_id)
     task = await get_task_by_id(db, task_id)
 
     if not task:
