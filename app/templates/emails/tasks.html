@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Ваши задачи</title>
+</head>
+<body>
+    <h2>📋 Список задач</h2>
+
+    {% for task in tasks %}
+        <hr>
+        <h3>📌 {{ task.title }}</h3>
+        <p><strong>ID:</strong> {{ task.id }}</p>
+        <p><strong>Статус:</strong> {{ task.status }}</p>
+        <p><strong>Описание:</strong><br>
+            {{ task.description or "—" }}
+        </p>
+    {% endfor %}
+
+    <hr>
+    <small>Отправлено из ABM</small>
+</body>
+</html>
