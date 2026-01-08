@@ -3,12 +3,13 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     """
-        Конфигурация приложения.
+    Конфигурация приложения.
 
-        Загружает значения из переменных окружения и файла `.env`.
-        Используется как единая точка доступа к настройкам
-        backend и Telegram-бота.
-        """
+    Загружает значения из переменных окружения и файла `.env`.
+    Используется как единая точка доступа к настройкам
+    backend и Telegram-бота.
+    """
+
     # --- Database ---
     DATABASE_URL: str
 

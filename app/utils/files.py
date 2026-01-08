@@ -1,4 +1,5 @@
 from aiogram.types import Message
+
 from app.schemas.marketing import MarketingAttachment
 
 
@@ -15,8 +16,7 @@ async def extract_attachments(message: Message) -> list[MarketingAttachment]:
             MarketingAttachment(
                 filename=message.document.file_name,
                 content=buffer.read(),
-                mime_type=message.document.mime_type
-                or "application/octet-stream",
+                mime_type=message.document.mime_type or "application/octet-stream",
             )
         )
 

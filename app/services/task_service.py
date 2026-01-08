@@ -1,7 +1,8 @@
 from typing import List, Optional, Tuple
 
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models.tasks import Task
 from app.schemas.task import TaskCreate, TaskUpdate
 
