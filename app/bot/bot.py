@@ -1,11 +1,12 @@
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from app.core.config import settings
-from app.bot.handlers.start import router as start_router
-from app.bot.handlers import task, forward_to_email  # подключаем наш handler
-from app.bot.handlers.list import router as list_router
-from app.bot.handlers.task_actions import router as task_actions_router
+
+from app.bot.handlers import forward_to_email, task  # подключаем наш handler
 from app.bot.handlers.edit_task import router as edit_task_router
+from app.bot.handlers.list import router as list_router
+from app.bot.handlers.start import router as start_router
+from app.bot.handlers.task_actions import router as task_actions_router
+from app.core.config import settings
 
 bot = Bot(token=settings.BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())

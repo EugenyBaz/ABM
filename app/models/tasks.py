@@ -1,14 +1,16 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import BigInteger, Column, DateTime, String, Text
 from sqlalchemy.sql import func
+
 from app.database.database import Base  # наш declarative_base
-from sqlalchemy import BigInteger
+
 
 class Task(Base):
-    """ ORM-модель задачи.
+    """ORM-модель задачи.
 
-        Представляет задачу пользователя в базе данных.
-        Используется SQLAlchemy declarative mapping.
-        """
+    Представляет задачу пользователя в базе данных.
+    Используется SQLAlchemy declarative mapping.
+    """
+
     __tablename__ = "tasks"
 
     id = Column(BigInteger, primary_key=True, nullable=False, index=True)

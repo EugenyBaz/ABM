@@ -1,7 +1,6 @@
 import pytest
-from unittest.mock import AsyncMock
+from app.services.email_service import send_task_email, send_tasks_email
 
-from app.services.email_service import send_tasks_email, send_task_email
 
 class FakeSMTP:
     def __init__(self, *args, **kwargs):
@@ -47,6 +46,7 @@ async def test_send_tasks_email(monkeypatch):
         tasks=tasks,
         subject="Test tasks",
     )
+
 
 @pytest.mark.asyncio
 async def test_send_task_email(monkeypatch):

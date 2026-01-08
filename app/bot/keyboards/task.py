@@ -1,4 +1,5 @@
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+
 from app.bot.callbacks import TaskAction
 
 
@@ -11,35 +12,35 @@ def task_keyboard(task_id: int) -> InlineKeyboardMarkup:
                     callback_data=TaskAction(
                         action="view",
                         task_id=task_id,
-                    ).pack()
+                    ).pack(),
                 ),
                 InlineKeyboardButton(
                     text="✏️ Edit",
                     callback_data=TaskAction(
                         action="edit",
                         task_id=task_id,
-                    ).pack()
+                    ).pack(),
                 ),
                 InlineKeyboardButton(
                     text="✅ Done",
                     callback_data=TaskAction(
                         action="done",
                         task_id=task_id,
-                    ).pack()
+                    ).pack(),
                 ),
                 InlineKeyboardButton(
                     text="📧 Email",
                     callback_data=TaskAction(
                         action="email",
                         task_id=task_id,
-                    ).pack()
+                    ).pack(),
                 ),
                 InlineKeyboardButton(
                     text="🗑 Delete",
                     callback_data=TaskAction(
                         action="delete",
                         task_id=task_id,
-                    ).pack()
+                    ).pack(),
                 ),
             ]
         ]
