@@ -1,7 +1,14 @@
 import sys
 from loguru import logger
 
-def setup_logging():
+def setup_logging() -> None:
+    """
+        Настройка логирования приложения.
+
+        Конфигурирует Loguru:
+        - вывод логов в консоль
+        - запись логов в файл с ротацией и хранением
+        """
     logger.remove()  # убираем дефолтный sink
 
     # Логи в консоль

@@ -6,7 +6,11 @@ from aiogram.types import BotCommand
 
 logging.basicConfig(level=logging.INFO)
 
-async def setup_commands():
+async def setup_commands() -> None:
+    """ Настройка команд Telegram-бота.
+        Регистрирует список доступных команд,
+        отображаемых в меню Telegram."""
+
     commands = [
         BotCommand(command="add_task", description="➕ Добавить задачу"),
         BotCommand(command="list", description="📝 Список задач"),
@@ -16,7 +20,11 @@ async def setup_commands():
 
 
 
-async def main():
+async def main() -> None:
+    """ Точка входа для запуска Telegram-бота.
+        Инициализирует команды и запускает polling.
+        Гарантирует корректное закрытие HTTP-сессии бота."""
+
     print("🚀 Telegram bot started")
 
     await setup_commands()

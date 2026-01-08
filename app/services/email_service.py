@@ -12,7 +12,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates", "emails")
 env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 
-async def send_tasks_email(to_email: str, tasks: list, subject: str = "Ваши задачи"):
+async def send_tasks_email(to_email: str, tasks: list, subject: str = "Ваши задачи") -> None:
+    """
+        Отправка email со списком задач пользователя.
+
+        Формирует HTML-письмо на основе шаблона `tasks.html`
+        и отправляет его через SMTP."""
+
     template = env.get_template("tasks.html")
     html_content = template.render(tasks=tasks)
 
@@ -38,7 +44,8 @@ async def send_task_email(
         to_email: str,
         task,
         subject: str = "Задача",
-):
+) -> None:
+    """Отправка email с одной задачей."""
     template = env.get_template("task.html")
     html_content = template.render(task=task)
 
@@ -61,6 +68,7 @@ async def send_task_email(
 
 
 async def send_marketing_email(message: MarketingMessage) -> None:
+    """Отправка маркетингового email с вложениями."""
     template = env.get_template("marketing.html")
 
     html_content = template.render(
