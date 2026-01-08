@@ -1,23 +1,25 @@
-from aiosmtplib import SMTP
-from email.message import EmailMessage
-from jinja2 import Environment, FileSystemLoader
 import os
+from email.message import EmailMessage
+
+from aiosmtplib import SMTP
+from jinja2 import Environment, FileSystemLoader
+
 from app.core.config import settings
 from app.schemas.marketing import MarketingMessage
-from datetime import datetime
-
-
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TEMPLATES_DIR = os.path.join(BASE_DIR, "templates", "emails")
 env = Environment(loader=FileSystemLoader(TEMPLATES_DIR))
 
-async def send_tasks_email(to_email: str, tasks: list, subject: str = "Ваши задачи") -> None:
-    """
-        Отправка email со списком задач пользователя.
 
-        Формирует HTML-письмо на основе шаблона `tasks.html`
-        и отправляет его через SMTP."""
+async def send_tasks_email(
+    to_email: str, tasks: list, subject: str = "Ваши задачи"
+) -> None:
+    """
+    Отправка email со списком задач пользователя.
+
+    Формирует HTML-письмо на основе шаблона `tasks.html`
+    и отправляет его через SMTP."""
 
     template = env.get_template("tasks.html")
     html_content = template.render(tasks=tasks)
@@ -32,7 +34,7 @@ async def send_tasks_email(to_email: str, tasks: list, subject: str = "Ваши 
     smtp = SMTP(
         hostname=settings.SMTP_HOST,
         port=settings.SMTP_PORT,
-        use_tls=True,   # <--- SSL
+        use_tls=True,  # <--- SSL
     )
     await smtp.connect()
     await smtp.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
@@ -40,10 +42,11 @@ async def send_tasks_email(to_email: str, tasks: list, subject: str = "Ваши 
     await smtp.quit()
     print(f"Письмо отправлено на {to_email}")
 
+
 async def send_task_email(
-        to_email: str,
-        task,
-        subject: str = "Задача",
+    to_email: str,
+    task,
+    subject: str = "Задача",
 ) -> None:
     """Отправка email с одной задачей."""
     template = env.get_template("task.html")
@@ -64,7 +67,6 @@ async def send_task_email(
     await smtp.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
     await smtp.send_message(message)
     await smtp.quit()
-
 
 
 async def send_marketing_email(message: MarketingMessage) -> None:

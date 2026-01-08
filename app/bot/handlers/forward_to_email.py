@@ -1,12 +1,13 @@
+import asyncio
+from collections import defaultdict
+from datetime import datetime, timezone
+
 from aiogram import Router
 from aiogram.types import Message
-from datetime import datetime, timezone
-from collections import defaultdict
-import asyncio
 
-from app.schemas.marketing import MarketingMessage, MarketingAttachment
-from app.services.email_service import send_marketing_email
 from app.core.config import settings
+from app.schemas.marketing import MarketingAttachment, MarketingMessage
+from app.services.email_service import send_marketing_email
 
 router = Router()
 
@@ -17,8 +18,9 @@ _media_group_tasks: dict[str, asyncio.Task] = {}
 
 # ---------- helpers ----------
 
+
 def get_sender_name(message: Message) -> str:
-    """ Получение имени отправителя пересланного сообщения."""
+    """Получение имени отправителя пересланного сообщения."""
     if message.forward_from:
         user = message.forward_from
         return " ".join(filter(None, [user.first_name, user.last_name]))
@@ -28,7 +30,7 @@ def get_sender_name(message: Message) -> str:
 
 
 async def extract_attachments(message: Message) -> list[MarketingAttachment]:
-    """ Извлечение вложений из сообщения Telegram."""
+    """Извлечение вложений из сообщения Telegram."""
     attachments: list[MarketingAttachment] = []
     bot = message.bot
 
@@ -41,8 +43,7 @@ async def extract_attachments(message: Message) -> list[MarketingAttachment]:
             MarketingAttachment(
                 filename=message.document.file_name,
                 content=buffer.read(),
-                mime_type=message.document.mime_type
-                or "application/octet-stream",
+                mime_type=message.document.mime_type or "application/octet-stream",
             )
         )
 
@@ -77,16 +78,14 @@ async def extract_attachments(message: Message) -> list[MarketingAttachment]:
 
 
 async def handle_media_group(messages: list[Message]) -> None:
-    """ Обработка группы сообщений (media group).
-        Собирает все вложения из группы и отправляет
-        одно письмо с общим текстом и вложениями."""
+    """Обработка группы сообщений (media group).
+    Собирает все вложения из группы и отправляет
+    одно письмо с общим текстом и вложениями."""
 
     base_message = messages[0]
 
     text = (
-        base_message.caption
-        or base_message.text
-        or "[Переслано сообщение без текста]"
+        base_message.caption or base_message.text or "[Переслано сообщение без текста]"
     )
 
     sender = get_sender_name(base_message)
@@ -113,12 +112,13 @@ async def handle_media_group(messages: list[Message]) -> None:
 
 # ---------- main handler ----------
 
+
 @router.message()
 async def handle_forwarded_message(message: Message) -> None:
-    """ Обработка пересланных сообщений для маркетинговой рассылки.
-        Поддерживает одиночные сообщения и media group.
-        Фильтрует пользователей по whitelist.
-        """
+    """Обработка пересланных сообщений для маркетинговой рассылки.
+    Поддерживает одиночные сообщения и media group.
+    Фильтрует пользователей по whitelist.
+    """
     # 1️⃣ whitelist пользователей
     allowed_users = settings.get_allowed_forward_users()
     if allowed_users:

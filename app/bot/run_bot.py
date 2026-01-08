@@ -1,15 +1,17 @@
-from app.bot.bot import dp, bot
 import asyncio
 import logging
+
 from aiogram.types import BotCommand
 
+from app.bot.bot import bot, dp
 
 logging.basicConfig(level=logging.INFO)
 
+
 async def setup_commands() -> None:
-    """ Настройка команд Telegram-бота.
-        Регистрирует список доступных команд,
-        отображаемых в меню Telegram."""
+    """Настройка команд Telegram-бота.
+    Регистрирует список доступных команд,
+    отображаемых в меню Telegram."""
 
     commands = [
         BotCommand(command="add_task", description="➕ Добавить задачу"),
@@ -19,11 +21,10 @@ async def setup_commands() -> None:
     await bot.set_my_commands(commands)
 
 
-
 async def main() -> None:
-    """ Точка входа для запуска Telegram-бота.
-        Инициализирует команды и запускает polling.
-        Гарантирует корректное закрытие HTTP-сессии бота."""
+    """Точка входа для запуска Telegram-бота.
+    Инициализирует команды и запускает polling.
+    Гарантирует корректное закрытие HTTP-сессии бота."""
 
     print("🚀 Telegram bot started")
 
@@ -33,6 +34,7 @@ async def main() -> None:
         await dp.start_polling(bot)
     finally:
         await bot.session.close()
+
 
 if __name__ == "__main__":
     asyncio.run(main())

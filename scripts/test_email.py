@@ -1,4 +1,5 @@
 import asyncio
+
 from app.services.email_service import send_tasks_email
 
 tasks = [

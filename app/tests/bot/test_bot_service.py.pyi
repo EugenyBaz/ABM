@@ -1,16 +1,17 @@
-from typing import Optional, Any
+from typing import Any, Optional
+from unittest.mock import AsyncMock
 
 import pytest
-from unittest.mock import AsyncMock
 
 from app.bot import services
 
 class FakeResponse:
     """
-        Фейковый HTTP-ответ для имитации httpx.Response.
+    Фейковый HTTP-ответ для имитации httpx.Response.
 
-        Используется в тестах для подмены ответов backend API.
-        """
+    Используется в тестах для подмены ответов backend API.
+    """
+
     def __init__(self, json_data=None, status_code=200) -> None:
         self._json = json_data
         self.status_code = status_code
@@ -21,41 +22,43 @@ class FakeResponse:
 
     def raise_for_status(self) -> None:
         """
-                Имитирует поведение raise_for_status().
+        Имитирует поведение raise_for_status().
 
-                Генерирует исключение при HTTP-ошибке.
-                """
+        Генерирует исключение при HTTP-ошибке.
+        """
         if self.status_code >= 400:
             raise Exception("HTTP error")
 
-
 class FakeAsyncClient:
     """
-        Фейковый AsyncClient для подмены httpx.AsyncClient.
+    Фейковый AsyncClient для подмены httpx.AsyncClient.
 
-        Используется в unit-тестах для изоляции
-        от реальных HTTP-запросов.
-        """
-    def __init__(self, *args, **kwargs)-> None:
+    Используется в unit-тестах для изоляции
+    от реальных HTTP-запросов.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
         pass
 
-    async def __aenter__(self)-> None:
+    async def __aenter__(self) -> None:
         return self
 
-    async def __aexit__(self, exc_type, exc, tb)-> None:
+    async def __aexit__(self, exc_type, exc, tb) -> None:
         pass
 
     async def post(self, *args, **kwargs) -> FakeResponse:
-        """ Имитирует POST-запрос. """
+        """Имитирует POST-запрос."""
 
         return FakeResponse({"status": "ok", "tasks_count": 2})
 
     async def get(self, *args, **kwargs):
         """Имитирует GET-запрос."""
-        return FakeResponse([
-            {"id": 1, "title": "Task 1", "status": "pending"},
-            {"id": 2, "title": "Task 2", "status": "done"},
-        ])
+        return FakeResponse(
+            [
+                {"id": 1, "title": "Task 1", "status": "pending"},
+                {"id": 2, "title": "Task 2", "status": "done"},
+            ]
+        )
 
     async def put(self, *args, **kwargs) -> FakeResponse:
         """Имитирует PUT-запрос."""
@@ -78,7 +81,6 @@ async def test_get_tasks_api(monkeypatch) -> None:
     assert len(result) == 2
     assert result[0]["title"] == "Task 1"
 
-
 @pytest.mark.asyncio
 async def test_create_task_api(monkeypatch) -> None:
     """Проверка создания задачи через API-сервис."""
@@ -95,8 +97,6 @@ async def test_create_task_api(monkeypatch) -> None:
 
     assert task["status"] == "ok"
 
-
-
 @pytest.mark.asyncio
 async def test_send_tasks_email_api(monkeypatch) -> None:
     """Проверка отправки email со списком задач."""
@@ -111,9 +111,8 @@ async def test_send_tasks_email_api(monkeypatch) -> None:
     assert result["status"] == "ok"
     assert result["tasks_count"] == 2
 
-
 @pytest.mark.asyncio
-async def test_send_task_email_api(monkeypatch) -> None :
+async def test_send_task_email_api(monkeypatch) -> None:
     """Проверка отправки email с одной задачей.
 
     Тест считается успешным, если исключение не выбрасывается."""

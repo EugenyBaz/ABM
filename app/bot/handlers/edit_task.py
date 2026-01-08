@@ -1,19 +1,21 @@
 from aiogram import Router, types
-from aiogram.fsm.state import State, StatesGroup
-from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter
-from app.bot.callbacks import EditField
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import CallbackQuery
 
+from app.bot.callbacks import EditField
 from app.bot.services import get_task_api, update_task_api
 
 router = Router()
 
 
 class EditTask(StatesGroup):
-    """ FSM-состояния для редактирования задачи """
+    """FSM-состояния для редактирования задачи"""
+
     waiting_for_field = State()
     waiting_for_value = State()
+
 
 @router.callback_query(EditField.filter())
 async def choose_edit_field(
@@ -21,7 +23,7 @@ async def choose_edit_field(
     callback_data: EditField,
     state: FSMContext,
 ) -> None:
-    """ Обработка callback-запроса выбора поля для редактирования задачи."""
+    """Обработка callback-запроса выбора поля для редактирования задачи."""
     data = await state.get_data()
     task_id = data["task_id"]
     user_id = callback.from_user.id
@@ -33,16 +35,16 @@ async def choose_edit_field(
     await state.update_data(field=field)
 
     await callback.message.answer(
-        f"✏️ <b>Редактируйте {field}:</b>\n\n"
-        f"{current_value}",
+        f"✏️ <b>Редактируйте {field}:</b>\n\n" f"{current_value}",
         parse_mode="HTML",
     )
 
     await callback.answer()
 
+
 @router.message(StateFilter(EditTask.waiting_for_value))
 async def update_task_value(message: types.Message, state: FSMContext) -> None:
-    """ Обновление сообщения с новым значением поля задачи."""
+    """Обновление сообщения с новым значением поля задачи."""
     data = await state.get_data()
 
     task_id = data["task_id"]
@@ -57,10 +59,8 @@ async def update_task_value(message: types.Message, state: FSMContext) -> None:
     )
 
     await message.answer(
-        f"✅ Задача обновлена\n\n"
-        f"📌 <b>{task['title']}</b>",
+        f"✅ Задача обновлена\n\n" f"📌 <b>{task['title']}</b>",
         parse_mode="HTML",
     )
 
     await state.clear()
-

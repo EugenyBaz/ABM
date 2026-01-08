@@ -1,10 +1,10 @@
+import httpx
 from aiogram import Router
 from aiogram.filters import Command
 from aiogram.types import Message
-import httpx
 
-from app.bot.services import get_tasks_api
 from app.bot.keyboards.task import task_keyboard
+from app.bot.services import get_tasks_api
 
 router = Router()
 

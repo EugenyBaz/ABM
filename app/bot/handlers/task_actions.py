@@ -1,16 +1,13 @@
-from aiogram import Router
-from aiogram.types import CallbackQuery
 import httpx
+from aiogram import Router
 from aiogram.fsm.context import FSMContext
-from app.bot.keyboards.edit_task import edit_field_keyboard
+from aiogram.types import CallbackQuery
 
-from app.bot.handlers.edit_task import EditTask
 from app.bot.callbacks import TaskAction
-from app.bot.services import (
-    get_task_api,
-    mark_task_done_api,
-    delete_task_api, send_task_email_api,
-)
+from app.bot.handlers.edit_task import EditTask
+from app.bot.keyboards.edit_task import edit_field_keyboard
+from app.bot.services import (delete_task_api, get_task_api,
+                              mark_task_done_api, send_task_email_api)
 
 router = Router()
 
@@ -21,9 +18,9 @@ async def handle_task_action(
     callback_data: TaskAction,
     state: FSMContext,
 ) -> None:
-    """ Обработчик callback-действий над задачей.
-        Поддерживает просмотр, редактирование, выполнение,
-        удаление и отправку задачи по email."""
+    """Обработчик callback-действий над задачей.
+    Поддерживает просмотр, редактирование, выполнение,
+    удаление и отправку задачи по email."""
 
     action = callback_data.action
     task_id = callback_data.task_id
@@ -57,17 +54,14 @@ async def handle_task_action(
         elif action == "done":
             task = await mark_task_done_api(task_id, user_id)
             await callback.message.edit_text(
-                f"✅ <b>{task['title']}</b>\n\n"
-                "Задача выполнена 👍",
+                f"✅ <b>{task['title']}</b>\n\n" "Задача выполнена 👍",
                 parse_mode="HTML",
             )
 
         # EMAIL
         elif action == "email":
             await send_task_email_api(task_id, user_id)
-            await callback.answer(
-                "📧 Задача отправлена на почту",
-                show_alert=True)
+            await callback.answer("📧 Задача отправлена на почту", show_alert=True)
             return
 
         # 🗑 DELETE
@@ -79,8 +73,6 @@ async def handle_task_action(
             await callback.answer("Неизвестное действие", show_alert=True)
             return
 
-
-
     except httpx.HTTPStatusError:
         await callback.answer("❌ Ошибка сервера", show_alert=True)
         return
@@ -91,4 +83,3 @@ async def handle_task_action(
 
     # Закрываем callback (убирает «часики»)
     await callback.answer()
-

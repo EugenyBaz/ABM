@@ -1,14 +1,17 @@
 import pytest
-from app.models.tasks import Task
 from app.schemas.task import TaskCreate, TaskUpdate
-from app.services.task_service import create_task, get_tasks, get_task_by_id, update_task, delete_task
+from app.services.task_service import (create_task, delete_task,
+                                       get_task_by_id, get_tasks, update_task)
 
 
 @pytest.mark.acincio
 async def test_create_task(db_session):
     user_id = 123
 
-    task_in = TaskCreate(title= "Test task", description = "Test description",)
+    task_in = TaskCreate(
+        title="Test task",
+        description="Test description",
+    )
 
     task = await create_task(
         db=db_session,
@@ -21,6 +24,7 @@ async def test_create_task(db_session):
     assert task.description == "Test description"
     assert task.user_id == user_id
     assert task.status == "pending"
+
 
 @pytest.mark.asyncio
 async def test_get_tasks_returns_only_user_tasks(db_session):
@@ -46,6 +50,7 @@ async def test_get_tasks_returns_only_user_tasks(db_session):
     assert len(tasks_user_1) == 1
     assert tasks_user_1[0].title == "User1 task"
 
+
 @pytest.mark.asyncio
 async def test_get_task_by_id(db_session):
     task = await create_task(
@@ -58,6 +63,7 @@ async def test_get_task_by_id(db_session):
 
     assert found is not None
     assert found.id == task.id
+
 
 @pytest.mark.asyncio
 async def test_update_task_success(db_session):
@@ -76,6 +82,7 @@ async def test_update_task_success(db_session):
 
     assert error is None
     assert updated.title == "New"
+
 
 @pytest.mark.asyncio
 async def test_update_task_forbidden(db_session):

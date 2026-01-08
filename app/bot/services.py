@@ -1,12 +1,13 @@
 import httpx
+
 from app.core.config import settings
 
 API_BASE_URL = f"{settings.API_URL}/tasks"
 
 
 def _auth_headers(user_id: int) -> dict:
-    """ Формирование заголовков авторизации для API-запросов.
-        Использует Telegram user id для идентификации пользователя."""
+    """Формирование заголовков авторизации для API-запросов.
+    Использует Telegram user id для идентификации пользователя."""
 
     return {
         "X-Telegram-User-Id": str(user_id),
@@ -15,7 +16,7 @@ def _auth_headers(user_id: int) -> dict:
 
 # ---------- CREATE ----------
 async def create_task_api(title: str, description: str, user_id: int) -> dict:
-    """ Создание новой задачи через backend API."""
+    """Создание новой задачи через backend API."""
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.post(
             f"{API_BASE_URL}/",
@@ -32,7 +33,7 @@ async def create_task_api(title: str, description: str, user_id: int) -> dict:
 
 # ---------- READ LIST ----------
 async def get_tasks_api(user_id: int, view: str = "short") -> list:
-    """ Получение списка задач пользователя через backend API. """
+    """Получение списка задач пользователя через backend API."""
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.get(
             f"{API_BASE_URL}/",
@@ -45,7 +46,7 @@ async def get_tasks_api(user_id: int, view: str = "short") -> list:
 
 # ---------- READ ONE ----------
 async def get_task_api(task_id: int, user_id: int) -> dict:
-    """ Получение одной задачи по ID через backend API."""
+    """Получение одной задачи по ID через backend API."""
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.get(
             f"{API_BASE_URL}/{task_id}",
@@ -57,7 +58,7 @@ async def get_task_api(task_id: int, user_id: int) -> dict:
 
 # ---------- UPDATE ----------
 async def mark_task_done_api(task_id: int, user_id: int) -> dict:
-    """ Отметка задачи как выполненной."""
+    """Отметка задачи как выполненной."""
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.put(
             f"{API_BASE_URL}/{task_id}",
@@ -69,7 +70,7 @@ async def mark_task_done_api(task_id: int, user_id: int) -> dict:
 
 
 async def update_task_api(task_id: int, user_id: int, data: dict) -> dict:
-    """ Обновление произвольных полей задачи."""
+    """Обновление произвольных полей задачи."""
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.put(
             f"{API_BASE_URL}/{task_id}",
@@ -82,7 +83,7 @@ async def update_task_api(task_id: int, user_id: int, data: dict) -> dict:
 
 # ---------- DELETE ----------
 async def delete_task_api(task_id: int, user_id: int) -> None:
-    """ Удаление задачи через backend API. """
+    """Удаление задачи через backend API."""
 
     async with httpx.AsyncClient(timeout=10.0) as client:
         response = await client.delete(
@@ -94,7 +95,7 @@ async def delete_task_api(task_id: int, user_id: int) -> None:
 
 # ---------- EMAIL ----------
 async def send_tasks_email_api(user_id: int) -> None:
-    """ Отправка списка всех задач пользователя на email."""
+    """Отправка списка всех задач пользователя на email."""
 
     async with httpx.AsyncClient(timeout=20.0) as client:
         response = await client.post(
@@ -106,7 +107,7 @@ async def send_tasks_email_api(user_id: int) -> None:
 
 
 async def send_task_email_api(task_id: int, user_id: int) -> None:
-    """ Отправка одной задачи на email. """
+    """Отправка одной задачи на email."""
 
     async with httpx.AsyncClient(timeout=20.0) as client:
         response = await client.post(
@@ -114,4 +115,3 @@ async def send_task_email_api(task_id: int, user_id: int) -> None:
             headers=_auth_headers(user_id),
         )
         response.raise_for_status()
-
