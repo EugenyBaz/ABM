@@ -4,6 +4,11 @@ from app.database.database import Base  # наш declarative_base
 from sqlalchemy import BigInteger
 
 class Task(Base):
+    """ ORM-модель задачи.
+
+        Представляет задачу пользователя в базе данных.
+        Используется SQLAlchemy declarative mapping.
+        """
     __tablename__ = "tasks"
 
     id = Column(BigInteger, primary_key=True, nullable=False, index=True)

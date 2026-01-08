@@ -1,3 +1,5 @@
+from typing import List, Optional, Tuple
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.models.tasks import Task
@@ -10,7 +12,10 @@ async def get_tasks(
     status: str | None = None,
     limit: int = 20,
     offset: int = 0,
-):
+) -> List[Task]:
+    """Получение списка задач пользователя.
+
+    Поддерживает фильтрацию по статусу и пагинацию."""
     stmt = select(Task).where(Task.user_id == user_id)
 
     if status:
@@ -26,7 +31,12 @@ async def get_tasks(
 async def get_task_by_id(
     db: AsyncSession,
     task_id: int,
-):
+) -> Optional[Task]:
+    """Получение задачи по ID без проверки пользователя.
+
+    Используется во внутренних сервисах,
+    где проверка прав выполняется отдельно."""
+
     return await db.get(Task, task_id)
 
 
@@ -34,7 +44,11 @@ async def create_task(
     db: AsyncSession,
     task: TaskCreate,
     user_id: int,
-):
+) -> Task:
+    """Создание новой задачи.
+
+    Сохраняет задачу в базе данных и
+    привязывает её к пользователю."""
     db_task = Task(
         **task.model_dump(),
         user_id=user_id,
@@ -50,7 +64,11 @@ async def update_task(
     task_id: int,
     user_id: int,
     task: TaskUpdate,
-):
+) -> Tuple[Optional[Task], Optional[str]]:
+    """Обновление существующей задачи.
+
+    Проверяет существование задачи и права доступа."""
+
     db_task = await get_task_by_id(db, task_id)
 
     if not db_task:
@@ -71,7 +89,11 @@ async def delete_task(
     db: AsyncSession,
     task_id: int,
     user_id: int,
-):
+) -> Tuple[Optional[Task], Optional[str]]:
+    """Удаление задачи.
+
+    Проверяет существование задачи и права доступа."""
+
     db_task = await get_task_by_id(db, task_id)
 
     if not db_task:

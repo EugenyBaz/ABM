@@ -18,6 +18,7 @@ _media_group_tasks: dict[str, asyncio.Task] = {}
 # ---------- helpers ----------
 
 def get_sender_name(message: Message) -> str:
+    """ Получение имени отправителя пересланного сообщения."""
     if message.forward_from:
         user = message.forward_from
         return " ".join(filter(None, [user.first_name, user.last_name]))
@@ -27,6 +28,7 @@ def get_sender_name(message: Message) -> str:
 
 
 async def extract_attachments(message: Message) -> list[MarketingAttachment]:
+    """ Извлечение вложений из сообщения Telegram."""
     attachments: list[MarketingAttachment] = []
     bot = message.bot
 
@@ -75,6 +77,10 @@ async def extract_attachments(message: Message) -> list[MarketingAttachment]:
 
 
 async def handle_media_group(messages: list[Message]) -> None:
+    """ Обработка группы сообщений (media group).
+        Собирает все вложения из группы и отправляет
+        одно письмо с общим текстом и вложениями."""
+
     base_message = messages[0]
 
     text = (
@@ -109,6 +115,10 @@ async def handle_media_group(messages: list[Message]) -> None:
 
 @router.message()
 async def handle_forwarded_message(message: Message) -> None:
+    """ Обработка пересланных сообщений для маркетинговой рассылки.
+        Поддерживает одиночные сообщения и media group.
+        Фильтрует пользователей по whitelist.
+        """
     # 1️⃣ whitelist пользователей
     allowed_users = settings.get_allowed_forward_users()
     if allowed_users:

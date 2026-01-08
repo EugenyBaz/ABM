@@ -20,7 +20,11 @@ async def handle_task_action(
     callback: CallbackQuery,
     callback_data: TaskAction,
     state: FSMContext,
-):
+) -> None:
+    """ Обработчик callback-действий над задачей.
+        Поддерживает просмотр, редактирование, выполнение,
+        удаление и отправку задачи по email."""
+
     action = callback_data.action
     task_id = callback_data.task_id
     user_id = callback.from_user.id

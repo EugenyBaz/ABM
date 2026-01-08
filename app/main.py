@@ -5,6 +5,15 @@ from app.database.database import engine, Base
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """
+        Жизненный цикл приложения FastAPI.
+
+        Startup:
+        - создаёт таблицы базы данных (используется для тестовой среды)
+
+        Shutdown:
+        - корректно закрывает соединение с базой данных
+        """
     # Startup: создаём таблицы (для теста)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -19,5 +28,8 @@ app.include_router(tasks_router)
 
 # Health check
 @app.get("/health")
-async def health_check():
+async def health_check() -> dict[str, str]:
+    """ Health check endpoint.
+
+    Используется для проверки доступности приложения. """
     return {"status": "ok"}

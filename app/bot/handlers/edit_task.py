@@ -11,6 +11,7 @@ router = Router()
 
 
 class EditTask(StatesGroup):
+    """ FSM-состояния для редактирования задачи """
     waiting_for_field = State()
     waiting_for_value = State()
 
@@ -19,7 +20,8 @@ async def choose_edit_field(
     callback: CallbackQuery,
     callback_data: EditField,
     state: FSMContext,
-):
+) -> None:
+    """ Обработка callback-запроса выбора поля для редактирования задачи."""
     data = await state.get_data()
     task_id = data["task_id"]
     user_id = callback.from_user.id
@@ -39,7 +41,8 @@ async def choose_edit_field(
     await callback.answer()
 
 @router.message(StateFilter(EditTask.waiting_for_value))
-async def update_task_value(message: types.Message, state: FSMContext):
+async def update_task_value(message: types.Message, state: FSMContext) -> None:
+    """ Обновление сообщения с новым значением поля задачи."""
     data = await state.get_data()
 
     task_id = data["task_id"]

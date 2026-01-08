@@ -4,11 +4,13 @@ from app.database.database import async_session
 from fastapi import Header, HTTPException
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """ Dependency для получения асинхронной сессии базы данных."""
     async with async_session() as session:
         yield session
 
 
-async def get_current_user_id(x_telegram_user_id: int | None = Header(None)):
+async def get_current_user_id(x_telegram_user_id: int | None = Header(None)) -> int:
+    """ Dependency для получения ID текущего пользователя из заголовка запроса. """
     if not x_telegram_user_id:
         raise HTTPException(status_code=401, detail="Отсутствует Telegram user id")
     return x_telegram_user_id

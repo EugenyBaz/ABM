@@ -4,7 +4,8 @@ from httpx import AsyncClient
 
 # ---------- CREATE ----------
 @pytest.mark.asyncio
-async def test_create_task(client: AsyncClient, user_1_headers):
+async def test_create_task(client: AsyncClient, user_1_headers)-> None:
+    """Проверка создания задачи."""
     response = await client.post(
         "/tasks/",
         json={
@@ -27,7 +28,8 @@ async def test_create_task(client: AsyncClient, user_1_headers):
 # ---------- READ LIST ----------
 
 @pytest.mark.asyncio
-async def test_get_tasks_only_own(client: AsyncClient, user_1_headers, user_2_headers):
+async def test_get_tasks_only_own(client: AsyncClient, user_1_headers, user_2_headers)-> None:
+   """Проверка получения только собственных задач пользователя."""
     # user 1
     await client.post(
         "/tasks/",
@@ -54,7 +56,8 @@ async def test_get_tasks_only_own(client: AsyncClient, user_1_headers, user_2_he
 # ---------- READ BY ID ----------
 
 @pytest.mark.asyncio
-async def test_get_task_by_id(client: AsyncClient, user_1_headers):
+async def test_get_task_by_id(client: AsyncClient, user_1_headers)-> None:
+    """Проверка получения задачи по ID владельцем."""
     r = await client.post(
         "/tasks/",
         json={"title": "Single task"},
@@ -72,7 +75,8 @@ async def test_get_task_by_id(client: AsyncClient, user_1_headers):
 
 
 @pytest.mark.asyncio
-async def test_get_task_forbidden(client: AsyncClient, user_1_headers, user_2_headers):
+async def test_get_task_forbidden(client: AsyncClient, user_1_headers, user_2_headers) -> None:
+    """Проверка запрета доступа к чужой задаче."""
     r = await client.post(
         "/tasks/",
         json={"title": "Private task"},
@@ -91,7 +95,8 @@ async def test_get_task_forbidden(client: AsyncClient, user_1_headers, user_2_he
 # ---------- UPDATE ----------
 
 @pytest.mark.asyncio
-async def test_update_task(client: AsyncClient, user_1_headers):
+async def test_update_task(client: AsyncClient, user_1_headers) -> None:
+    """ Проверка обновления задачи владельцем."""
     r = await client.post(
         "/tasks/",
         json={"title": "Old title"},
@@ -112,7 +117,8 @@ async def test_update_task(client: AsyncClient, user_1_headers):
 
 
 @pytest.mark.asyncio
-async def test_update_task_forbidden(client: AsyncClient, user_1_headers, user_2_headers):
+async def test_update_task_forbidden(client: AsyncClient, user_1_headers, user_2_headers) -> None:
+    """Проверка запрета обновления чужой задачи."""
     r = await client.post(
         "/tasks/",
         json={"title": "Protected task"},
@@ -132,7 +138,8 @@ async def test_update_task_forbidden(client: AsyncClient, user_1_headers, user_2
 # ---------- DELETE ----------
 
 @pytest.mark.asyncio
-async def test_delete_task(client: AsyncClient, user_1_headers):
+async def test_delete_task(client: AsyncClient, user_1_headers) -> None:
+    """Проверка удаления задачи владельцем."""
     r = await client.post(
         "/tasks/",
         json={"title": "To be deleted"},
@@ -149,7 +156,8 @@ async def test_delete_task(client: AsyncClient, user_1_headers):
 
 
 @pytest.mark.asyncio
-async def test_delete_task_forbidden(client: AsyncClient, user_1_headers, user_2_headers):
+async def test_delete_task_forbidden(client: AsyncClient, user_1_headers, user_2_headers) -> None:
+    """Проверка запрета удаления чужой задачи."""
     r = await client.post(
         "/tasks/",
         json={"title": "Protected delete"},
@@ -168,7 +176,8 @@ async def test_delete_task_forbidden(client: AsyncClient, user_1_headers, user_2
 # ---------- FILTERS ----------
 
 @pytest.mark.asyncio
-async def test_filter_by_status(client: AsyncClient, user_1_headers):
+async def test_filter_by_status(client: AsyncClient, user_1_headers)->None:
+    """Проверка фильтрации задач по статусу."""
     await client.post(
         "/tasks/",
         json={"title": "Pending task"},
