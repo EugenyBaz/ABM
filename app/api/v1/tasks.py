@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List
+from typing import List, Any
 from app.schemas.task import TaskCreate, TaskUpdate, TaskOut
 from app.services.task_service import create_task, get_tasks, get_task_by_id, update_task, delete_task
 from app.api.deps import get_db, get_current_user_id
@@ -16,7 +16,8 @@ async def read_tasks(
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id),
-):
+) -> List[TaskOut]:
+    """ Получение списка всех задач """
     return await get_tasks(
         db=db,
         user_id=user_id,
@@ -30,7 +31,10 @@ async def read_task(
     task_id: int,
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id),
-):
+)-> TaskOut:
+    """ Получение одной задачи по ID."""
+
+    print("READ TASKS user_id =", user_id)
     task = await get_task_by_id(db, task_id)
 
     if not task:
@@ -42,7 +46,10 @@ async def read_task(
     return task
 
 @router.post("/", response_model=TaskOut)
-async def create_new_task(task: TaskCreate, db: AsyncSession = Depends(get_db), user_id: int = Depends(get_current_user_id)):
+async def create_new_task(task: TaskCreate,
+                          db: AsyncSession = Depends(get_db),
+                          user_id: int = Depends(get_current_user_id)) -> TaskOut :
+    """Создание новой задачи для текущего пользователя."""
     return await create_task(db, task, user_id)
 
 @router.put("/{task_id}", response_model=TaskOut)
@@ -51,7 +58,8 @@ async def update_existing_task(
     task: TaskUpdate,
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id),
-):
+) -> TaskOut :
+    """ Обновление существующей задачи"""
     updated_task, error = await update_task(db, task_id, user_id, task)
 
     if error == "not_found":
@@ -68,7 +76,8 @@ async def delete_existing_task(
     task_id: int,
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id),
-):
+) -> TaskOut :
+    """ Удаление существующей задачи """
     deleted_task, error = await delete_task(db, task_id, user_id)
 
     if error == "not_found":
@@ -83,7 +92,8 @@ async def delete_existing_task(
 async def email_tasks(
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id),
-):
+) -> dict[str, Any]:
+    """ Отправка списка всех задач на email"""
     tasks = await get_tasks(db=db, user_id=user_id)
 
     if not tasks:
@@ -110,7 +120,8 @@ async def email_single_task(
     task_id: int,
     db: AsyncSession = Depends(get_db),
     user_id: int = Depends(get_current_user_id),
-):
+) -> dict[str, Any] :
+    """ Отправка одной задачи на email"""
     task = await get_task_by_id(db, task_id)
 
     if not task:

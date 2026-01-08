@@ -47,7 +47,10 @@ DATABASE_URL = settings.DATABASE_URL
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 
-def run_migrations_offline():
+def run_migrations_offline() -> None :
+    """ В этом режиме подключение к базе данных не создаётся.
+    Alembic генерирует SQL-скрипты напрямую без выполнения."""
+
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -60,7 +63,11 @@ def run_migrations_offline():
         context.run_migrations()
 
 
-async def run_migrations_online_async():
+async def run_migrations_online_async() -> None:
+    """ Асинхронный запуск миграций в online-режиме.
+    Создаётся async-движок SQLAlchemy и выполняются миграции
+    через синхронную обёртку Alembic."""
+
     connectable = create_async_engine(DATABASE_URL, poolclass=pool.NullPool)
 
     async with connectable.connect() as connection:
@@ -69,11 +76,15 @@ async def run_migrations_online_async():
     await connectable.dispose()
 
 
-def run_migrations_online():
+def run_migrations_online() -> None:
+    """ Запуск online-миграций.
+        Оборачивает асинхронную логику запуска Alembic
+        в стандартный event loop.
+        """
     asyncio.run(run_migrations_online_async())
 
 
-def do_run_migrations(connection):
+def do_run_migrations(connection) -> None:
     """Синхронная обертка для Alembic"""
     context.configure(connection=connection, target_metadata=target_metadata)
     with context.begin_transaction():
