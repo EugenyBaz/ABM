@@ -58,6 +58,14 @@ jobs:
           poetry config virtualenvs.create false
           poetry install --no-root
 
+      - name: Debug DATABASE_URL
+        run: |
+          echo "DATABASE_URL='$DATABASE_URL'"
+          python - <<'EOF'
+          import os
+          print("RAW:", repr(os.getenv("DATABASE_URL")))
+          EOF
+
       - name: Run migrations
         run: alembic upgrade head
 
