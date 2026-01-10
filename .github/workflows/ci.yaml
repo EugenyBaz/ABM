@@ -3,12 +3,11 @@ name: CI
 on:
   push:
     branches:
-      - main            # Основная ветвь
+      - main
       - develop
-      - feature      # Добавляем ветвь features
+      - feature
   pull_request:
     types: [opened, synchronize, reopened]
-
 
 jobs:
   tests:
@@ -24,22 +23,23 @@ jobs:
           POSTGRES_USER: abm
           POSTGRES_PASSWORD: abm
         options: >-
-          --health-cmd="pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"
+          --health-cmd="pg_isready -U abm -d abm"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
 
+    # ⚠️ ВАЖНО: НИКАКИХ secrets здесь
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      API_URL: ${{ secrets.API_URL }}
-      SMTP_HOST: ${{ secrets.SMTP_HOST }}
-      SMTP_PORT: ${{ secrets.SMTP_PORT }}
-      SMTP_USER: ${{ secrets.SMTP_USER }}
-      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-      REPORT_EMAIL: ${{ secrets.REPORT_EMAIL }}
-      ALLOWED_FORWARD_USERS: ${{ secrets.ALLOWED_FORWARD_USERS }}
-      MARKETING_EMAIL_SUBJECT: ${{ secrets.MARKETING_EMAIL_SUBJECT }}
+      DATABASE_URL: postgresql+asyncpg://abm:abm@localhost:5432/abm
+      API_URL: http://testserver
+      BOT_TOKEN: test
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+      SMTP_USER: test
+      SMTP_PASSWORD: test
+      REPORT_EMAIL: test@example.com
+      ALLOWED_FORWARD_USERS: ""
+      MARKETING_EMAIL_SUBJECT: "[TEST]"
 
     steps:
       - name: Checkout code
@@ -57,14 +57,6 @@ jobs:
         run: |
           poetry config virtualenvs.create false
           poetry install --no-root
-
-      - name: Debug DATABASE_URL
-        run: |
-          echo "DATABASE_URL='$DATABASE_URL'"
-          python - <<'EOF'
-          import os
-          print("RAW:", repr(os.getenv("DATABASE_URL")))
-          EOF
 
       - name: Run migrations
         run: alembic upgrade head
