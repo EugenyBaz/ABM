@@ -56,7 +56,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry config virtualenvs.create false
-          poetry install
+          poetry install --no-root
 
       - name: Run migrations
         run: alembic upgrade head
