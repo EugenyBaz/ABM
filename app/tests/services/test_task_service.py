@@ -4,7 +4,7 @@ from app.services.task_service import (create_task, delete_task,
                                        get_task_by_id, get_tasks, update_task)
 
 
-@pytest.mark.acincio
+@pytest.mark.asyncio
 async def test_create_task(db_session):
     user_id = 123
 
