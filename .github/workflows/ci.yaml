@@ -32,7 +32,14 @@ jobs:
     env:
       DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-      API_URL: "http://localhost:8000"
+      API_URL: ${{ secrets.API_URL }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      REPORT_EMAIL: ${{ secrets.REPORT_EMAIL }}
+      ALLOWED_FORWARD_USERS: ${{ secrets.ALLOWED_FORWARD_USERS }}
+      MARKETING_EMAIL_SUBJECT: ${{ secrets.MARKETING_EMAIL_SUBJECT }}
 
     steps:
       - name: Checkout code
