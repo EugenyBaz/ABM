@@ -103,7 +103,7 @@ python -m app.bot.main
 
 - роли пользователей
 - Docker + docker-compose
-- in process  CI/CD
+- in process CI/CD
 - админ-панель
 
 👤 Автор
