@@ -2,12 +2,8 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
-      - develop
-      - feature
+    branches: [main, develop, feature]
   pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
   tests:
@@ -28,18 +24,17 @@ jobs:
           --health-timeout=5s
           --health-retries=5
 
-    # ⚠️ ВАЖНО: НИКАКИХ secrets здесь
     env:
-      DATABASE_URL: postgresql+asyncpg://abm:abm@localhost:5432/abm
-      API_URL: http://testserver
-      BOT_TOKEN: test
+      DATABASE_URL: postgresql+asyncpg://abm:abm@postgres:5432/abm
+      BOT_TOKEN: dummy
+      API_URL: http://localhost
       SMTP_HOST: localhost
       SMTP_PORT: 1025
       SMTP_USER: test
       SMTP_PASSWORD: test
-      REPORT_EMAIL: test@example.com
+      REPORT_EMAIL: test@test.com
       ALLOWED_FORWARD_USERS: ""
-      MARKETING_EMAIL_SUBJECT: "[TEST]"
+      MARKETING_EMAIL_SUBJECT: "test"
 
     steps:
       - name: Checkout code
