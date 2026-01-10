@@ -20,7 +20,7 @@ jobs:
           POSTGRES_PASSWORD: abm
 
     env:
-      DATABASE_URL: postgresql+asyncpg://abm:abm@localhost:5432/abm
+      DATABASE_URL: ppostgresql+asyncpg://postgres:postgres@localhost:5432/abm
       BOT_TOKEN: dummy
       API_URL: http://localhost
       SMTP_HOST: localhost
