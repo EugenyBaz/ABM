@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main            # Основная ветвь
+      - develop
+      - feature      # Добавляем ветвь features
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: abm
+          POSTGRES_USER: abm
+          POSTGRES_PASSWORD: abm
+        options: >-
+          --health-cmd="pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+      BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      API_URL: ${{ secrets.API_URL }}
+      SMTP_HOST: ${{ secrets.SMTP_HOST }}
+      SMTP_PORT: ${{ secrets.SMTP_PORT }}
+      SMTP_USER: ${{ secrets.SMTP_USER }}
+      SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+      REPORT_EMAIL: ${{ secrets.REPORT_EMAIL }}
+      ALLOWED_FORWARD_USERS: ${{ secrets.ALLOWED_FORWARD_USERS }}
+      MARKETING_EMAIL_SUBJECT: ${{ secrets.MARKETING_EMAIL_SUBJECT }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.create false
+          poetry install
+
+      - name: Run migrations
+        run: alembic upgrade head
+
+      - name: Run tests
+        run: pytest
