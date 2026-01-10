@@ -30,7 +30,7 @@ jobs:
           --health-retries=5
 
     env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       API_URL: ${{ secrets.API_URL }}
       SMTP_HOST: ${{ secrets.SMTP_HOST }}
