@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop, feature]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: abm
+          POSTGRES_USER: abm
+          POSTGRES_PASSWORD: abm
+
+    env:
+      DATABASE_URL: postgresql+asyncpg://abm:abm@localhost:5432/abm
+      BOT_TOKEN: dummy
+      API_URL: http://localhost
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+      SMTP_USER: test
+      SMTP_PASSWORD: test
+      REPORT_EMAIL: test@test.com
+      ALLOWED_FORWARD_USERS: ""
+      MARKETING_EMAIL_SUBJECT: "test"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: |
+          poetry config virtualenvs.create false
+          poetry install --no-root
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..20}; do
+            pg_isready -h localhost -p 5432 -U abm && break
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+
+      - name: Run migrations
+        run: alembic upgrade head
+
+      - name: Run tests
+        run: pytest
