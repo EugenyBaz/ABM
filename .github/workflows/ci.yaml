@@ -18,14 +18,9 @@ jobs:
           POSTGRES_DB: abm
           POSTGRES_USER: abm
           POSTGRES_PASSWORD: abm
-        options: >-
-          --health-cmd="pg_isready -U abm -d abm"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=5
 
     env:
-      DATABASE_URL: postgresql+asyncpg://abm:abm@postgres:5432/abm
+      DATABASE_URL: postgresql+asyncpg://abm:abm@localhost:5432/abm
       BOT_TOKEN: dummy
       API_URL: http://localhost
       SMTP_HOST: localhost
@@ -52,6 +47,14 @@ jobs:
         run: |
           poetry config virtualenvs.create false
           poetry install --no-root
+
+      - name: Wait for Postgres
+        run: |
+          for i in {1..20}; do
+            pg_isready -h localhost -p 5432 -U abm && break
+            echo "Waiting for postgres..."
+            sleep 2
+          done
 
       - name: Run migrations
         run: alembic upgrade head
