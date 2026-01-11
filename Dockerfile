@@ -1,35 +1,26 @@
 FROM python:3.12-slim-bullseye
 
-# Рабочая директория
 WORKDIR /app
 
-# --- FIX: HTTPS + IPv4 для apt (критично для Docker/VPS) ---
-RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list && \
-    echo 'Acquire::ForceIPv4 "true";' > /etc/apt/apt.conf.d/99force-ipv4
-
-# Системные зависимости
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        build-essential \
-        libpq-dev \
-        wget \
-        gnupg \
-        ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
-
-# Копируем только файлы зависимостей (кэш Docker)
+# Копируем только файлы зависимостей (Docker cache)
 COPY pyproject.toml poetry.lock ./
 
-# Установка Poetry
-RUN wget -qO- https://install.python-poetry.org | \
-    PYTHONNOUSERSITE=1 python -
+# Установка Poetry БЕЗ wget/curl
+RUN python - <<'EOF'
+import urllib.request
+urllib.request.urlretrieve(
+    "https://install.python-poetry.org",
+    "/tmp/install-poetry.py"
+)
+EOF
 
-# Добавляем Poetry в PATH
+RUN PYTHONNOUSERSITE=1 python /tmp/install-poetry.py
+
 ENV PATH="/root/.local/bin:$PATH"
 
-# Отключаем venv и ставим зависимости
+# Ставим только prod-зависимости, без venv
 RUN poetry config virtualenvs.create false && \
-    poetry install
+    poetry install --no-root
 
-# Копируем остальной код
+# Копируем код
 COPY . .
