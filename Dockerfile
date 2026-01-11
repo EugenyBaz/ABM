@@ -1,24 +1,20 @@
-# ---------- builder ----------
-FROM ghcr.io/python-poetry/poetry:1.8-python3.12 AS builder
+FROM python:3.12-slim-bullseye
 
 WORKDIR /app
 
-COPY pyproject.toml poetry.lock* ./
+# Устанавливаем необходимые зависимости и очищаем кэш
+RUN apt-get update && \
+    apt-get install -y build-essential libpq-dev wget gnupg ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN poetry config virtualenvs.create false \
-    && poetry install --no-root
+COPY pyproject.toml poetry.lock ./
+
+# Установка Poetry
+RUN wget -O- https://install.python-poetry.org | PYTHONNOUSERSITE=1 python -
+
+ENV PATH="/root/.local/bin:$PATH"
+
+# Настройка виртуального окружения и установка зависимостей
+RUN poetry config virtualenvs.create false && poetry install --no-root
 
 COPY . .
-
-# ---------- runtime ----------
-FROM python:3.12-slim
-
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
-
-WORKDIR /app
-
-COPY --from=builder /usr/local /usr/local
-COPY --from=builder /app /app
-
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
