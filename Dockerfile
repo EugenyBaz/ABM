@@ -2,11 +2,10 @@ FROM python:3.12-slim-bullseye
 
 WORKDIR /app
 
-# Обновляем pip
-RUN pip install --no-cache-dir --upgrade pip
+COPY pyproject.toml poetry.lock ./
 
-# Устанавливаем Poetry из PyPI (СТАБИЛЬНО)
-RUN pip install --no-cache-dir poetry
+# Установка Poetry
+RUN wget -O- https://install.python-poetry.org | PYTHONNOUSERSITE=1 python -
 
 # Копируем файлы зависимостей
 COPY pyproject.toml poetry.lock ./
