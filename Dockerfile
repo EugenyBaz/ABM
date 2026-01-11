@@ -7,8 +7,8 @@ COPY pyproject.toml poetry.lock ./
 # Установка Poetry
 RUN wget -O- https://install.python-poetry.org | PYTHONNOUSERSITE=1 python -
 
-# Копируем файлы зависимостей
-COPY pyproject.toml poetry.lock ./
+# ДОБАВЛЯЕМ Poetry в PATH (КЛЮЧЕВО!)
+ENV PATH="/root/.local/bin:$PATH"
 
 # Ставим зависимости без venv
 RUN poetry config virtualenvs.create false && \
