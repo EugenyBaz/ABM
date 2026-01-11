@@ -4,8 +4,7 @@ from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 
-from app.bot.services import (create_task_api, get_tasks_api,
-                              send_tasks_email_api)
+from app.bot.services import create_task_api, get_tasks_api, send_tasks_email_api
 
 router = Router()
 

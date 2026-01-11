@@ -6,8 +6,12 @@ from aiogram.types import CallbackQuery
 from app.bot.callbacks import TaskAction
 from app.bot.handlers.edit_task import EditTask
 from app.bot.keyboards.edit_task import edit_field_keyboard
-from app.bot.services import (delete_task_api, get_task_api,
-                              mark_task_done_api, send_task_email_api)
+from app.bot.services import (
+    delete_task_api,
+    get_task_api,
+    mark_task_done_api,
+    send_task_email_api,
+)
 
 router = Router()
 

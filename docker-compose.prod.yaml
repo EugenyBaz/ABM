@@ -1,8 +1,7 @@
 services:
   api:
-    image: abm_api
+    image: eugenybaz/abm:latest
     container_name: abm_api
-    build: .
     restart: always
     env_file:
       - .env.prod
@@ -17,9 +16,8 @@ services:
       - db
 
   bot:
-    image: abm_bot
+    image: eugenybaz/abm:latest
     container_name: abm_bot
-    build: .
     restart: always
     env_file:
       - .env.prod

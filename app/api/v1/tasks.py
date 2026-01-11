@@ -7,8 +7,13 @@ from app.api.deps import get_current_user_id, get_db
 from app.core.config import settings
 from app.schemas.task import TaskCreate, TaskOut, TaskUpdate
 from app.services.email_service import send_task_email, send_tasks_email
-from app.services.task_service import (create_task, delete_task,
-                                       get_task_by_id, get_tasks, update_task)
+from app.services.task_service import (
+    create_task,
+    delete_task,
+    get_task_by_id,
+    get_tasks,
+    update_task,
+)
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
