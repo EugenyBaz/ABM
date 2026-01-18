@@ -2,17 +2,14 @@ FROM python:3.12-slim-bullseye
 
 WORKDIR /app
 
-# Увеличиваем таймауты и ретраи
-ENV PIP_DEFAULT_TIMEOUT=120
-ENV PIP_RETRIES=10
-ENV POETRY_HTTP_TIMEOUT=120
+# Устанавливаем Poetry
+RUN pip install --no-cache-dir poetry
 
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir poetry
-
+# Копируем только зависимости (для Docker cache)
 COPY pyproject.toml poetry.lock ./
 
+# Ставим зависимости без venv
 RUN poetry config virtualenvs.create false && \
     poetry install --no-root
-
+# Копируем код
 COPY . .

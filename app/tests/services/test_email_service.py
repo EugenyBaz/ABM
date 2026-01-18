@@ -1,4 +1,5 @@
 import pytest
+
 from app.services.email_service import send_task_email, send_tasks_email
 
 
