@@ -34,6 +34,7 @@ services:
     environment:
       POSTGRES_DB: abm
       POSTGRES_USER: abm
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
 
