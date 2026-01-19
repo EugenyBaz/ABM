@@ -107,6 +107,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no \
               ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd ~/abm
             docker compose -f docker-compose.prod.yaml pull
             docker compose -f docker-compose.prod.yaml up -d
           EOF
